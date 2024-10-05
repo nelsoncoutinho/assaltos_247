@@ -200,3 +200,29 @@ local function getPlayerIdentifiers(source)
 	end
 	return identifiers
 end
+
+-- Função para verificar atualizações
+local function checkForUpdates()
+	PerformHttpRequest("https://api.github.com/repos/nelsoncoutinho/assaltos_247/releases/latest", function(err, text, headers)
+		if err ~= 200 then
+			print("^1Erro ao verificar atualizações para assaltos_247^7")
+			return
+		end
+		
+		local data = json.decode(text)
+		if data.tag_name ~= GetResourceMetadata(GetCurrentResourceName(), "version", 0) then
+			print("^3Uma nova versão do assaltos_247 está disponível!^7")
+			print("^3Versão atual: " .. GetResourceMetadata(GetCurrentResourceName(), "version", 0) .. "^7")
+			print("^3Nova versão: " .. data.tag_name .. "^7")
+			print("^3Baixe a nova versão em: " .. data.html_url .. "^7")
+		else
+			print("^2assaltos_247 está atualizado.^7")
+		end
+	end, "GET", "", {["Content-Type"] = "application/json"})
+end
+
+-- Verificar atualizações ao iniciar o recurso
+Citizen.CreateThread(function()
+	Citizen.Wait(5000) -- Espera 5 segundos para garantir que tudo esteja carregado
+	checkForUpdates()
+end)
