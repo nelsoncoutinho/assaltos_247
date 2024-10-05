@@ -160,7 +160,7 @@ end)
 -- Callback to check the number of police officers
 lib.callback.register('assaltos_247:server:checkcops', function(source)
 	local currentTime = os.time()
-	if currentTime - lastPoliceCheck > 60 then -- Verifica a cada 60 segundos
+	if currentTime - lastPoliceCheck > 60 then -- Checks every 60 seconds
 		policeCount = 0
 		local xPlayers = ESX.GetExtendedPlayers()
 		for _, xPlayer in pairs(xPlayers) do
@@ -173,10 +173,10 @@ lib.callback.register('assaltos_247:server:checkcops', function(source)
 	return policeCount >= Config.RequiredPolice, policeCount
 end)
 
--- Thread para atualizar o estado do roubo
+-- Thread to update the robbery state
 Citizen.CreateThread(function()
 	while true do
-		Citizen.Wait(1000) -- Verifica a cada segundo
+		Citizen.Wait(1000) -- Checks every second
 		if rob then
 			for source, currentStore in pairs(robbers) do
 				local xPlayer = ESX.GetPlayerFromId(source)
@@ -188,7 +188,7 @@ Citizen.CreateThread(function()
 	end
 end)
 
--- Função para obter identificadores do jogador
+-- Function to get player identifiers
 local function getPlayerIdentifiers(source)
 	local identifiers = {}
 	for k,v in pairs(GetPlayerIdentifiers(source)) do
@@ -201,28 +201,28 @@ local function getPlayerIdentifiers(source)
 	return identifiers
 end
 
--- Função para verificar atualizações
+-- Function to check for updates
 local function checkForUpdates()
 	PerformHttpRequest("https://api.github.com/repos/nelsoncoutinho/assaltos_247/releases/latest", function(err, text, headers)
 		if err ~= 200 then
-			print("^1Erro ao verificar atualizações para assaltos_247^7")
+			print("^1Error checking for updates for assaltos_247^7")
 			return
 		end
 		
 		local data = json.decode(text)
 		if data.tag_name ~= GetResourceMetadata(GetCurrentResourceName(), "version", 0) then
-			print("^3Uma nova versão do assaltos_247 está disponível!^7")
-			print("^3Versão atual: " .. GetResourceMetadata(GetCurrentResourceName(), "version", 0) .. "^7")
-			print("^3Nova versão: " .. data.tag_name .. "^7")
-			print("^3Baixe a nova versão em: " .. data.html_url .. "^7")
+			print("^3A new version of assaltos_247 is available!^7")
+			print("^3Current version: " .. GetResourceMetadata(GetCurrentResourceName(), "version", 0) .. "^7")
+			print("^3New version: " .. data.tag_name .. "^7")
+			print("^3Download the new version at: " .. data.html_url .. "^7")
 		else
-			print("^2assaltos_247 está atualizado.^7")
+			print("^2assaltos_247 is up to date.^7")
 		end
 	end, "GET", "", {["Content-Type"] = "application/json"})
 end
 
--- Verificar atualizações ao iniciar o recurso
+-- Check for updates when the resource starts
 Citizen.CreateThread(function()
-	Citizen.Wait(5000) -- Espera 5 segundos para garantir que tudo esteja carregado
+	Citizen.Wait(5000) -- Wait 5 seconds to ensure everything is loaded
 	checkForUpdates()
 end)
